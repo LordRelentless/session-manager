@@ -13,3 +13,5 @@ apply their store signatures after upload.
 ---
 
 © 2016 [Teddy Cross](https://teddy.io), © 2026 K.J. Martin, shared under the [MIT license](https://opensource.org/licenses/MIT).
+
+Note: Attempting to load either MV2 or MV3 version presently kicks a corruption error in Firefox, I'm looking into this. 
