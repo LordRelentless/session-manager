@@ -1,5 +1,5 @@
 {
-	"manifest_version": 2,
+	"manifest_version": 3,
 	"name": "Session Manager",
 	"version": "3.6.0",
 	"description": "Simple yet powerful tab set management. Quickly and easily save, update, remove, and restore sets of tabs!",
@@ -7,7 +7,7 @@
 		"16": "img/16.png",
 		"128": "img/128.png"
 	},
-	"browser_action": {
+	"action": {
 		"default_icon": {
 			"19": "img/19-1x.png",
 			"38": "img/19-2x.png"
@@ -16,22 +16,17 @@
 		"default_popup": "popup.html"
 	},
 	"background": {
-		"scripts": ["js/analytics-stub.js", "js/errors.js", "js/background.js"]
+		"service_worker": "js/background-chrome-mv3.js"
 	},
-	"content_security_policy": "script-src 'self'; object-src 'self'",
-	"offline_enabled": true,
 	"omnibox": {
 		"keyword": "session"
 	},
 	"options_page": "options.html",
 	"options_ui": {
-		"page": "options.html",
-		"browser_style": true
+		"page": "options.html"
 	},
-	"permissions": ["tabs", "omnibox"],
-	"browser_specific_settings": {
-		"gecko": {
-			"strict_min_version": "109.0"
-		}
+	"permissions": ["tabs", "omnibox", "storage"],
+	"content_security_policy": {
+		"extension_pages": "script-src 'self'; object-src 'self'"
 	}
 }

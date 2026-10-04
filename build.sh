@@ -1,11 +1,11 @@
 #!/bin/bash
-# $ bash build.sh outdir gaid rbid [chrome|firefox-mv2|firefox-mv3]
+# $ bash build.sh outdir gaid rbid [chrome-mv3|firefox-mv2|firefox-mv3]
 
 SRCDIR="$( cd "$( dirname "$0" )" && pwd )"
 OUTDIR="$1"
 GAID="$2"
 RBID="$3"
-TARGET="${4:-chrome}"
+TARGET="${4:-chrome-mv3}"
 
 rm -rf "$OUTDIR"
 cp -R "$SRCDIR" "$OUTDIR"
@@ -13,21 +13,27 @@ cd "$OUTDIR"
 
 rm build.sh
 rm -rf .git
+rm -rf dist
 
 case "$TARGET" in
-	chrome)
+	chrome-mv3)
+		cp manifests/chrome-mv3.json manifest.json
 		rm -rf manifests
 		rm js/analytics-stub.js
+		rm js/analytics.js
+		rm js/background.js
 		;;
 	firefox-mv2)
 		cp manifests/firefox-mv2.json manifest.json
 		rm -rf manifests
 		rm js/analytics.js
+		rm js/background-chrome-mv3.js
 		;;
 	firefox-mv3)
 		cp manifests/firefox-mv3.json manifest.json
 		rm -rf manifests
 		rm js/analytics.js
+		rm js/background-chrome-mv3.js
 		;;
 	*)
 		echo "Unknown target: $TARGET" >&2

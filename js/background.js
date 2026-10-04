@@ -82,6 +82,15 @@ chrome.omnibox.onInputEntered.addListener(function (name) {
 
 chrome.omnibox.setDefaultSuggestion({ description: "Open a session in this window" });
 
+chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
+	if (message.type === "open-session") {
+		sendResponse({ opened: openSession(message.windowId, message.urls, message.event, message.isTemp) !== false });
+	} else if (message.type === "analytics") {
+		window.ga && window.ga.apply(window, message.args);
+		sendResponse({});
+	}
+});
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // Opening

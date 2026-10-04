@@ -1,4 +1,4 @@
-(function(){ "use strict";
+ExtensionState.initialize(function(){ "use strict";
 
 /*** utils ***/
 var utils = {
@@ -32,8 +32,29 @@ var utils = {
 };
 
 
-/*** data ***/
-var background = chrome.extension.getBackgroundPage();
+/*** background messaging ***/
+function track() {
+	chrome.runtime.sendMessage({ type: "analytics", args: Array.prototype.slice.call(arguments) });
+}
+
+function requestOpen(windowId, urls, event, isTemp) {
+	chrome.runtime.sendMessage({
+		type: "open-session",
+		windowId: windowId,
+		urls: urls,
+		event: event && {
+			ctrlKey: event.ctrlKey,
+			metaKey: event.metaKey,
+			shiftKey: event.shiftKey,
+			altKey: event.altKey,
+		},
+		isTemp: isTemp,
+	}, function (response) {
+		if (!chrome.runtime.lastError && response && response.opened) {
+			window.close();
+		}
+	});
+}
 
 var state = {
 	name: "",
@@ -57,6 +78,7 @@ var sessions = {
 		}
 		
 		localStorage.sessions = JSON.stringify(sessions.list);
+		ExtensionState.save({ sessions: localStorage.sessions, temp: sessions.temp || null });
 		$.each(sessions.list, function(name){
 			$("<div/>").html("<big>" + utils.escape(name) + "</big><a>&times;</a><br>" +
 				sessions.display(name, true) +
@@ -111,7 +133,7 @@ var actions = {
 			next();
 		});
 		
-		background.ga("send", "event", "Action", "Import", state.entered);
+		track("send", "event", "Action", "Import", state.entered);
 	}],
 	
 	export: [function(){
@@ -121,7 +143,7 @@ var actions = {
 	}, function(){
 		$("#export-check").fadeIn().delay(2000).fadeOut();
 		
-		background.ga("send", "event", "Action", "Export");
+		track("send", "event", "Action", "Export");
 	}],
 	
 	rename: [function(name){
@@ -146,7 +168,7 @@ var actions = {
 			delete sessions.list[oname];
 		}
 		
-		background.ga("send", "event", "Session", "Rename");
+		track("send", "event", "Session", "Rename");
 	}],
 	
 	add: [function(name){
@@ -156,7 +178,7 @@ var actions = {
 			Array.prototype.push.apply(name === null ? sessions.temp : sessions.list[name], tabs);
 		});
 		
-		background.ga("send", "event", name === null ? "Temp": "Session", "AddWin");
+		track("send", "event", name === null ? "Temp": "Session", "AddWin");
 	}],
 	
 	tab: [function(name){
@@ -167,13 +189,13 @@ var actions = {
 			sessions.load();
 		});
 		
-		background.ga("send", "event", name === null ? "Temp": "Session", "AddTab");
+		track("send", "event", name === null ? "Temp": "Session", "AddTab");
 	}],
 	
 	replace: [function(name){
 		utils.confirm("Are you sure you want to replace " + sessions.display(name) + " with the current window's tabs?");
 	}, function(name){
-		background.ga("send", "event", "Session", sessions.list[name] ? "Replace" : "Save");
+		track("send", "event", "Session", sessions.list[name] ? "Replace" : "Save");
 		
 		utils.tabs(function(tabs){
 			sessions.list[name] = tabs;
@@ -191,7 +213,7 @@ var actions = {
 			delete sessions.list[name];
 		}
 		
-		background.ga("send", "event", name === null ? "Temp" : "Session", "Remove");
+		track("send", "event", name === null ? "Temp" : "Session", "Remove");
 	}],
 	
 	savetemp: [function(){
@@ -199,7 +221,7 @@ var actions = {
 			sessions.temp = tabs;
 		});
 		
-		background.ga("send", "event", "Temp", "Save");
+		track("send", "event", "Temp", "Save");
 	}],
 	
 	save: [function(){
@@ -238,7 +260,7 @@ $("#main-saved-list").on("click", "big, div > a:not([title])", function(){
 	
 	if (action === "open") {
 		chrome.windows.getCurrent(function(win){
-			background.openSession(win.id, sessions.list[name], e, false) !== false && window.close();
+			requestOpen(win.id, sessions.list[name], e, false);
 		});
 	} else {
 		utils.action(action);
@@ -251,7 +273,7 @@ $("#main-saved-temp").on("click", "a:not([title])", function(e){
 	
 	if (action === "open") {
 		chrome.windows.getCurrent(function(win){
-			background.openSession(win.id, sessions.temp, e, true) !== false && window.close();
+			requestOpen(win.id, sessions.temp, e, true);
 		});
 	} else if (action.length === 1) {
 		utils.action("remove");
@@ -283,9 +305,9 @@ if (location.search) {
 	
 	utils.view("import");
 	
-	background.ga("send", "pageview", "/import");
+	track("send", "pageview", "/import");
 } else {
-	background.ga("send", "pageview", "/popup");
+	track("send", "pageview", "/popup");
 }
 
-})();
+});

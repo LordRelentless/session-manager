@@ -1,6 +1,14 @@
-Build a Firefox package with `bash build.sh outdir gaid rbid firefox-mv2` or
-`bash build.sh outdir gaid rbid firefox-mv3`. Firefox packages disable remote
-analytics. Omitting the target keeps the existing Chrome package.
+Download the upload-ready extension packages:
+
+- [Chrome MV3](dist/session-manager-chrome-mv3.zip)
+- [Firefox MV2](dist/session-manager-firefox-mv2.zip)
+- [Firefox MV3](dist/session-manager-firefox-mv3.zip)
+
+To rebuild them, use `bash build.sh outdir - - chrome-mv3`,
+`bash build.sh outdir - - firefox-mv2`, or
+`bash build.sh outdir - - firefox-mv3`. Firefox and Chrome packages disable
+remote analytics. The ZIPs are unsigned: Firefox AMO and the Chrome Web Store
+apply their store signatures after upload.
 
 ---
 
