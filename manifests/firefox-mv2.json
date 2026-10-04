@@ -16,17 +16,22 @@
 		"default_popup": "popup.html"
 	},
 	"background": {
-		"scripts": ["js/analytics.js", "js/errors.js", "js/background.js"]
+		"scripts": ["js/analytics-stub.js", "js/errors.js", "js/background.js"]
 	},
-	"content_security_policy": "script-src 'self' https://www.google-analytics.com; object-src 'self'",
+	"content_security_policy": "script-src 'self'; object-src 'self'",
 	"offline_enabled": true,
 	"omnibox": {
 		"keyword": "session"
 	},
 	"options_page": "options.html",
 	"options_ui": {
-		"chrome_style": true,
-		"page": "options.html"
+		"page": "options.html",
+		"browser_style": true
 	},
-	"permissions": ["tabs"]
+	"permissions": ["tabs", "omnibox"],
+	"browser_specific_settings": {
+		"gecko": {
+			"strict_min_version": "109.0"
+		}
+	}
 }
